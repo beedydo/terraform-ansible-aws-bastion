@@ -1,0 +1,10 @@
+[bastion_host]
+bastion ansible_host=interview.demo.bastion ansible_user=ec2-user
+
+[resource_server]
+resource ansible_host=interview.demo.resource ansible_user=ec2-user
+
+[all:vars]
+bastion_public_ip=18.142.141.30
+bastion_private_ip=10.0.0.5
+resource_private_ip=10.0.0.21

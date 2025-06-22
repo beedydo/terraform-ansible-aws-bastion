@@ -1,0 +1,99 @@
+---
+- name: Configure local SSH client
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: Update local SSH config
+      ansible.builtin.blockinfile:
+        path: ~/.ssh/config
+        block: |
+          Host interview.demo.bastion
+            HostName {{ bastion_public_ip }}
+            User ec2-user
+            IdentityFile /Users/beedydo/Desktop/interview-demo-key.pem
+          Host interview.demo.resource
+            HostName {{ resource_private_ip }}
+            User ec2-user
+            IdentityFile /Users/beedydo/Desktop/resource_key
+            ProxyJump interview.demo.bastion
+        marker: "# {mark} ANSIBLE MANAGED BLOCK - interview-demo"
+        create: true
+
+- name: Configure bastion host
+  hosts: bastion_host
+  become: true
+  tasks:
+    - name: Update sshd_config
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        line: "{{ item }}"
+        state: present
+        validate: "/usr/sbin/sshd -t -f %s"
+      loop:
+        - "AllowTcpForwarding yes"
+        - "GatewayPorts yes"
+      notify: restart sshd
+
+    - name: Ensure .ssh directory exists
+      ansible.builtin.file:
+        path: "~/.ssh"
+        state: directory
+        mode: 0700
+
+    - name: Copy private key to bastion
+      ansible.builtin.copy:
+        src: "/Users/beedydo/Desktop/resource_key"
+        dest: "~/.ssh/resource_key"
+        mode: 0600
+
+    - name: Configure bastion SSH config
+      ansible.builtin.blockinfile:
+        path: "~/.ssh/config"
+        block: |
+          Host resource
+            HostName {{ resource_private_ip }}
+            IdentityFile ~/.ssh/resource_key
+        marker: "# {mark} ANSIBLE MANAGED BLOCK - resource"
+        create: true
+
+    - name: Update /etc/hosts
+      ansible.builtin.lineinfile:
+        path: /etc/hosts
+        line: "{{ item }}"
+        state: present
+      loop:
+        - "{{ bastion_public_ip }} {{ bastion_private_ip }} interview.demo.bastion"
+        - "{{ resource_private_ip }} interview.demo.resource"
+
+    - name: Set bastion hostname
+      ansible.builtin.hostname:
+        name: interview.demo.bastion
+
+  handlers:
+    - name: Restart sshd
+      ansible.builtin.service:
+        name: sshd
+        state: restarted
+
+- name: Configure resource server
+  hosts: resource_server
+  become: true
+  tasks:
+    - name: Create admin user
+      ansible.builtin.user:
+        name: admin
+        password: "{{ 'admin' | password_hash('sha512') }}"
+        shell: /bin/bash
+
+    - name: Update /etc/hosts
+      ansible.builtin.lineinfile:
+        path: /etc/hosts
+        line: "{{ item }}"
+        state: present
+      loop:
+        - "{{ bastion_public_ip }} {{ bastion_private_ip }} interview.demo.bastion"
+        - "{{ resource_private_ip }} interview.demo.resource"
+
+    - name: Set resource hostname
+      ansible.builtin.hostname:
+        name: interview.demo.resource
