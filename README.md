@@ -107,3 +107,73 @@ This project automates the deployment of a secure AWS bastion host and resource 
   - Transfer and store resource server private key
 - **Resource Server:**
   - Configure hostname and user account
+ 
+## Local Files that are editted by Ansible Playbook:
+
+**In my local host:**
+
+Append the `~/.ssh/config` file to include:
+
+```console
+Host interview.demo.bastion
+  HostName bastion_public_ip
+  User ec2-user
+  IdentityFile /Users/beedydo/Desktop/interview-demo-key.pem
+
+Host interview.demo.resource
+  HostName resource_private_ip
+  User ec2-user
+  IdentityFile /Users/beedydo/Desktop/resource_key
+  ProxyJump interview.demo.bastion
+```
+
+---
+
+**Bastion host:**
+
+- **Change hostname to:** `interview.demo.bastion`
+- **Append the `/etc/ssh/sshd_config` file to include:**
+
+```console
+AllowTcpForwarding yes
+GatewayPorts yes
+```
+
+- **Send the private key “resource_key” from localhost to bastion host and store it in `~/.ssh`**
+- **Append `~/.ssh/config`:**
+
+```console
+Host resource
+  HostName 10.0.0.21
+  IdentityFile ~/.ssh/resource_key
+```
+
+- **Append the `/etc/hosts` file to include:**
+
+```console
+bastion_public_ip bastion_private_IP interview.demo.bastion
+resource_private_ip interview.demo.resource
+```
+
+---
+
+**Resource server:**
+
+- **Change hostname to:** `interview.demo.resource`
+- **Within the instance, also create:**
+- **A user called:** `admin`
+- **With password:** `admin`
+- **Append the `/etc/hosts` file to include:**
+
+```console
+bastion_public_ip bastion_private_IP interview.demo.bastion
+resource_private_ip interview.demo.resource
+```
+
+## Before running Terraform script:
+
+```console
+export AWS_ACCESS_KEY_ID="YOUR_ACCESS_KEY"
+export AWS_SECRET_ACCESS_KEY="YOUR_SECRET_KEY"
+export AWS_REGION="ap-southeast-1"
+```
