@@ -180,3 +180,8 @@ export AWS_ACCESS_KEY_ID="YOUR_ACCESS_KEY"
 export AWS_SECRET_ACCESS_KEY="YOUR_SECRET_KEY"
 export AWS_REGION="ap-southeast-1"
 ```
+
+## Assumptions:
+
+- key-pairs are managed and stored on AWS
+  - use cloud-init to provide keys managed outside of AWS
