@@ -2,6 +2,9 @@
 
 ![Screenshot 2025-06-23 at 1 14 29 AM](https://github.com/user-attachments/assets/f7e96471-cf76-42b1-97d0-2beffe89a024)
 
+<img width="1225" alt="Screenshot 2025-06-23 at 11 32 14 AM" src="https://github.com/user-attachments/assets/030e5694-457f-4947-a820-b95855dc47d4" />
+
+
 # AWS Bastion Host Infrastructure as Code (Terraform + Ansible)
 
 This project automates the deployment of a secure AWS bastion host and resource server using Terraform for infrastructure provisioning and Ansible for configuration management.
