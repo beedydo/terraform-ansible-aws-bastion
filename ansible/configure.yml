@@ -2,26 +2,40 @@
 - name: Configure local SSH client
   hosts: localhost
   connection: local
+  vars_files:
+    - vars.yml
+
   tasks:
     - name: Update local SSH config
       ansible.builtin.blockinfile:
-        path: ~/.ssh/config
+        path: /Users/beedydo/.ssh/config
         block: |
-          Host interview.demo.bastion
-            HostName {{ bastion_public_ip }}
+          Host terrable.demo.bastion {{ bastion_elastic_ip }}
+            HostName {{ bastion_elastic_ip }}
             User ec2-user
-            IdentityFile /Users/beedydo/Desktop/interview-demo-key.pem
-          Host interview.demo.resource
+            IdentityFile /Users/beedydo/.ssh/interview-demo-key.pem
+          Host terrable.demo.resource {{ resource_private_ip }}
             HostName {{ resource_private_ip }}
             User ec2-user
-            IdentityFile /Users/beedydo/Desktop/resource_key
-            ProxyJump interview.demo.bastion
+            IdentityFile /Users/beedydo/.ssh/resource_key
+            ProxyJump terrable.demo.bastion
         marker: "# {mark} ANSIBLE MANAGED BLOCK - interview-demo"
         create: true
+
+    - name: Remove bastion host from known_hosts
+      ansible.builtin.shell: ssh-keygen -R "{{ bastion_elastic_ip }}"
+      changed_when: false
+
+    - name: Remove resource server from known_hosts
+      ansible.builtin.shell: ssh-keygen -R "{{ resource_private_ip }}"
+      changed_when: false
 
 - name: Configure bastion host
   hosts: bastion_host
   become: true
+  vars_files:
+    - vars.yml
+
   tasks:
     - name: Update sshd_config
       ansible.builtin.lineinfile:
@@ -36,23 +50,30 @@
 
     - name: Ensure .ssh directory exists
       ansible.builtin.file:
-        path: "~/.ssh"
+        path: "/home/ec2-user/.ssh"
         state: directory
         mode: 0700
 
     - name: Copy private key to bastion
       ansible.builtin.copy:
-        src: "/Users/beedydo/Desktop/resource_key"
-        dest: "~/.ssh/resource_key"
-        mode: 0600
+        src: "/Users/beedydo/.ssh/resource_key"
+        dest: "/home/ec2-user/.ssh/resource_key"
+        mode: 0400  
+
+    - name: Set ownership and permissions for private key
+      ansible.builtin.file:
+        path: /home/ec2-user/.ssh/resource_key
+        owner: ec2-user
+        group: ec2-user
+        mode: "0400" 
 
     - name: Configure bastion SSH config
       ansible.builtin.blockinfile:
-        path: "~/.ssh/config"
+        path: "/home/ec2-user/.ssh/config"
         block: |
-          Host resource
+          Host terrable.demo.resource {{ resource_private_ip }}
             HostName {{ resource_private_ip }}
-            IdentityFile ~/.ssh/resource_key
+            IdentityFile /home/ec2-user/.ssh/resource_key
         marker: "# {mark} ANSIBLE MANAGED BLOCK - resource"
         create: true
 
@@ -62,15 +83,15 @@
         line: "{{ item }}"
         state: present
       loop:
-        - "{{ bastion_public_ip }} {{ bastion_private_ip }} interview.demo.bastion"
-        - "{{ resource_private_ip }} interview.demo.resource"
+        - "{{ bastion_elastic_ip }} {{ bastion_private_ip }} terrable.demo.bastion"
+        - "{{ resource_private_ip }} terrable.demo.resource"
 
     - name: Set bastion hostname
       ansible.builtin.hostname:
-        name: interview.demo.bastion
+        name: terrable.demo.bastion
 
   handlers:
-    - name: Restart sshd
+    - name: restart sshd
       ansible.builtin.service:
         name: sshd
         state: restarted
@@ -78,6 +99,9 @@
 - name: Configure resource server
   hosts: resource_server
   become: true
+  vars_files:
+    - vars.yml
+
   tasks:
     - name: Create admin user
       ansible.builtin.user:
@@ -91,9 +115,9 @@
         line: "{{ item }}"
         state: present
       loop:
-        - "{{ bastion_public_ip }} {{ bastion_private_ip }} interview.demo.bastion"
-        - "{{ resource_private_ip }} interview.demo.resource"
+        - "{{ bastion_elastic_ip }} {{ bastion_private_ip }} terrable.demo.bastion"
+        - "{{ resource_private_ip }} terrable.demo.resource"
 
     - name: Set resource hostname
       ansible.builtin.hostname:
-        name: interview.demo.resource
+        name: terrable.demo.resource
