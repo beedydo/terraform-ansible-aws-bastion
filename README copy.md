@@ -77,7 +77,7 @@ This project automates the deployment of a secure AWS bastion host and resource 
     - All traffic from private subnet: 10.0.0.16/28
   - **Outbound:**
     - All traffic to trusted IP: "{{ MyIP }}"/32
-- **Hostname:** terrable.demo.bastion
+- **Hostname:** terrible.demo.bastion
 - **Ansible tasks:**
   - Enable SSH forwarding (`AllowTcpForwarding yes`, `GatewayPorts yes`)
   - Update `/etc/hosts` for DNS resolution
@@ -94,7 +94,7 @@ This project automates the deployment of a secure AWS bastion host and resource 
     - ICMP from bastion host
   - **Outbound:**
     - All traffic to bastion host
-- **Hostname:** terrable.demo.resource
+- **Hostname:** terrible.demo.resource
 - **Ansible tasks:**
   - Create user: admin with password admin
   - Update `/etc/hosts` for DNS resolution
@@ -118,23 +118,23 @@ This project automates the deployment of a secure AWS bastion host and resource 
 Append the `~/.ssh/config` file to include:
 
 ```console
-Host terrable.demo.bastion bastion_public_ip
+Host terrible.demo.bastion bastion_public_ip
   HostName bastion_public_ip
   User ec2-user
   IdentityFile /Users/beedydo/Desktop/"{{ your_key_pair }}"
 
-Host terrable.demo.resource resource_private_ip
+Host terrible.demo.resource resource_private_ip
   HostName resource_private_ip
   User ec2-user
   IdentityFile /Users/beedydo/Desktop/"{{ your_resource_key }}"
-  ProxyJump terrable.demo.bastion
+  ProxyJump terrible.demo.bastion
 ```
 
 ---
 
 **Bastion host:**
 
-- **Change hostname to:** `terrable.demo.bastion`
+- **Change hostname to:** `terrible.demo.bastion`
 - **Append the `/etc/ssh/sshd_config` file to include:**
 
 ```console
@@ -154,26 +154,26 @@ Host resource
 - **Append the `/etc/hosts` file to include:**
 
 ```console
-bastion_public_ip bastion_private_IP terrable.demo.bastion
-resource_private_ip terrable.demo.resource
+bastion_public_ip bastion_private_IP terrible.demo.bastion
+resource_private_ip terrible.demo.resource
 ```
 
 ---
 
 **Resource server:**
 
-- **Change hostname to:** `terrable.demo.resource`
+- **Change hostname to:** `terrible.demo.resource`
 - **Within the instance, also create:**
 - **A user called:** `admin`
 - **With password:** `admin`
 - **Append the `/etc/hosts` file to include:**
 
 ```console
-bastion_public_ip bastion_private_IP terrable.demo.bastion
-resource_private_ip terrable.demo.resource
+bastion_public_ip bastion_private_IP terrible.demo.bastion
+resource_private_ip terrible.demo.resource
 ```
 
-## Before running Terraform script:
+## Before running Terriform script:
 
 ```console
 export AWS_ACCESS_KEY_ID="YOUR_ACCESS_KEY"
