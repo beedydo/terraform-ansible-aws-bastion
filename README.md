@@ -45,7 +45,7 @@
     - All traffic from private subnet: 10.0.0.16/28
   - **Outbound:**
     - All traffic to trusted IP: 220.255.73.250/32
-- **Hostname:** interview.demo.bastion
+- **Hostname:** terrable.demo.bastion
     - All traffic to trusted IP: "{{ MyIP }}"/32
 - **Hostname:** terrable.demo.bastion
 - **Ansible tasks:**
@@ -62,7 +62,7 @@
     - ICMP from bastion host
   - **Outbound:**
     - All traffic to bastion host
-- **Hostname:** interview.demo.resource
+- **Hostname:** terrable.demo.resource
 - **Hostname:** terrable.demo.resource
 - **Ansible tasks:**
   - Create user: admin with password admin
@@ -70,19 +70,17 @@
 Append the `~/.ssh/config` file to include:
 
 ```console
-Host interview.demo.bastion
 Host terrable.demo.bastion bastion_public_ip
   HostName bastion_public_ip
   User ec2-user
   IdentityFile /Users/beedydo/Desktop/interview-demo-key.pem
   IdentityFile /Users/beedydo/Desktop/"{{ your_key_pair }}"
 
-Host interview.demo.resource
 Host terrable.demo.resource resource_private_ip
   HostName resource_private_ip
   User ec2-user
   IdentityFile /Users/beedydo/Desktop/resource_key
-  ProxyJump interview.demo.bastion
+  ProxyJump terrable.demo.bastion
   IdentityFile /Users/beedydo/Desktop/"{{ your_resource_key }}"
   ProxyJump terrable.demo.bastion
 ```
@@ -91,7 +89,7 @@ Host terrable.demo.resource resource_private_ip
 
 **Bastion host:**
 
-- **Change hostname to:** `interview.demo.bastion`
+- **Change hostname to:** `terrable.demo.bastion`
 - **Change hostname to:** `terrable.demo.bastion`
 - **Append the `/etc/ssh/sshd_config` file to include:**
 
@@ -114,8 +112,8 @@ Host resource
 - **Append the `/etc/hosts` file to include:**
 
 ```console
-bastion_public_ip bastion_private_IP interview.demo.bastion
-resource_private_ip interview.demo.resource
+bastion_public_ip bastion_private_IP terrable.demo.bastion
+resource_private_ip terrable.demo.resource
 bastion_public_ip bastion_private_IP terrable.demo.bastion
 resource_private_ip terrable.demo.resource
 ```
@@ -124,7 +122,7 @@ resource_private_ip terrable.demo.resource
 
 **Resource server:**
 
-- **Change hostname to:** `interview.demo.resource`
+- **Change hostname to:** `terrable.demo.resource`
 - **Change hostname to:** `terrable.demo.resource`
 - **Within the instance, also create:**
 - **A user called:** `admin`
@@ -132,8 +130,8 @@ resource_private_ip terrable.demo.resource
 - **Append the `/etc/hosts` file to include:**
 
 ```console
-bastion_public_ip bastion_private_IP interview.demo.bastion
-resource_private_ip interview.demo.resource
+bastion_public_ip bastion_private_IP terrable.demo.bastion
+resource_private_ip terrable.demo.resource
 bastion_public_ip bastion_private_IP terrable.demo.bastion
 resource_private_ip terrable.demo.resource
 ```
