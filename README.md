@@ -3,13 +3,9 @@
 ![Screenshot 2025-06-23 at 1 14 29 AM](https://github.com/user-attachments/assets/f7e96471-cf76-42b1-97d0-2beffe89a024)
 
 <img width="1225" alt="Screenshot 2025-06-23 at 11 32 14 AM" src="https://github.com/user-attachments/assets/030e5694-457f-4947-a820-b95855dc47d4" />
-![Screenshot 2025-06-26 at 1 43 41 PM](https://github.com/user-attachments/assets/afce6e71-b018-4a11-a8c0-1fd087811c67)
-
-![terraform-ansible-aws-bastion drawio](https://github.com/user-attachments/assets/858740e4-3f63-4749-a778-6579835bbca6)
 
 # AWS Bastion Host Infrastructure as Code (Terraform + Ansible)
 
-@@ -39,11 +38,12 @@
 - **CIDR:** 10.0.0.0/28
 - **Network ACL (NACL):**
   - **Inbound:**
@@ -25,7 +21,6 @@
 - **Route Table:**
   - `0.0.0.0/0` → Internet Gateway
   - `10.0.0.0/24` → Local
-@@ -54,7 +54,7 @@
 - **Network ACL (NACL):**
   - **Inbound:**
     - SSH from public subnet: 10.0.0.0/28
@@ -34,7 +29,6 @@
     - All traffic from public subnet: 10.0.0.0/28
   - **Outbound:**
     - All traffic to public subnet: 10.0.0.0/28
-@@ -68,16 +68,16 @@
 **Bastion Host:**
 
 - **Deployed in the public subnet**
@@ -57,7 +51,6 @@
 - **Ansible tasks:**
   - Enable SSH forwarding (`AllowTcpForwarding yes`, `GatewayPorts yes`)
   - Update `/etc/hosts` for DNS resolution
-@@ -87,14 +87,14 @@
 
 - **Deployed in the private subnet**
 - **No public IP**
@@ -74,7 +67,6 @@
 - **Ansible tasks:**
   - Create user: admin with password admin
   - Update `/etc/hosts` for DNS resolution
-@@ -118,70 +118,70 @@
 Append the `~/.ssh/config` file to include:
 
 ```console
