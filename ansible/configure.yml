@@ -4,30 +4,27 @@
   connection: local
   vars_files:
     - vars.yml
-
   tasks:
     - name: Update local SSH config
       ansible.builtin.blockinfile:
-        path: /Users/beedydo/.ssh/config
+        path: "{{ local_ssh_key_path }}/config"
         block: |
-          Host terrable.demo.bastion {{ bastion_elastic_ip }}
+          Host {{ bastion_hostname }} {{ bastion_elastic_ip }}
             HostName {{ bastion_elastic_ip }}
-            User ec2-user
-            IdentityFile /Users/beedydo/.ssh/interview-demo-key.pem
-          Host terrable.demo.resource {{ resource_private_ip }}
+            User {{ remote_user }}
+            IdentityFile {{ local_ssh_key_path }}/{{ bastion_key_name }}.pem
+          Host {{ resource_hostname }} {{ resource_private_ip }}
             HostName {{ resource_private_ip }}
-            User ec2-user
-            IdentityFile /Users/beedydo/.ssh/resource_key
-            ProxyJump terrable.demo.bastion
+            User {{ remote_user }}
+            IdentityFile {{ local_ssh_key_path }}/{{ resource_key_name }}
+            ProxyJump {{ bastion_hostname }}
         marker: "# {mark} ANSIBLE MANAGED BLOCK - interview-demo"
         create: true
 
-    - name: Remove bastion host from known_hosts
-      ansible.builtin.shell: ssh-keygen -R "{{ bastion_elastic_ip }}"
-      changed_when: false
-
-    - name: Remove resource server from known_hosts
-      ansible.builtin.shell: ssh-keygen -R "{{ resource_private_ip }}"
+    - name: Refresh known_hosts
+      ansible.builtin.shell: |
+        ssh-keygen -R "{{ bastion_elastic_ip }}"
+        ssh-keygen -R "{{ resource_private_ip }}"
       changed_when: false
 
 - name: Configure bastion host
@@ -35,60 +32,55 @@
   become: true
   vars_files:
     - vars.yml
-
   tasks:
-    - name: Update sshd_config
+    - name: Configure SSH daemon
       ansible.builtin.lineinfile:
         path: /etc/ssh/sshd_config
-        line: "{{ item }}"
-        state: present
+        regexp: "^{{ item.key }}"
+        line: "{{ item.key }} {{ item.value }}"
         validate: "/usr/sbin/sshd -t -f %s"
       loop:
-        - "AllowTcpForwarding yes"
-        - "GatewayPorts yes"
+        - { key: "AllowTcpForwarding", value: "yes" }
+        - { key: "GatewayPorts", value: "yes" }
       notify: restart sshd
 
-    - name: Ensure .ssh directory exists
+    - name: Setup SSH directory
       ansible.builtin.file:
-        path: "/home/ec2-user/.ssh"
+        path: "/home/{{ remote_user }}/.ssh"
         state: directory
         mode: 0700
+        owner: "{{ remote_user }}"
+        group: "{{ remote_user }}"
 
-    - name: Copy private key to bastion
+    - name: Deploy resource server key
       ansible.builtin.copy:
-        src: "/Users/beedydo/.ssh/resource_key"
-        dest: "/home/ec2-user/.ssh/resource_key"
-        mode: 0400  
+        src: "{{ local_ssh_key_path }}/{{ resource_key_name }}"
+        dest: "/home/{{ remote_user }}/.ssh/{{ resource_key_name }}"
+        mode: 0400
+        owner: "{{ remote_user }}"
+        group: "{{ remote_user }}"
 
-    - name: Set ownership and permissions for private key
-      ansible.builtin.file:
-        path: /home/ec2-user/.ssh/resource_key
-        owner: ec2-user
-        group: ec2-user
-        mode: "0400" 
-
-    - name: Configure bastion SSH config
+    - name: Configure SSH client for resource server
       ansible.builtin.blockinfile:
-        path: "/home/ec2-user/.ssh/config"
+        path: "/home/{{ remote_user }}/.ssh/config"
         block: |
-          Host terrable.demo.resource {{ resource_private_ip }}
+          Host {{ resource_hostname }} {{ resource_private_ip }}
             HostName {{ resource_private_ip }}
-            IdentityFile /home/ec2-user/.ssh/resource_key
+            IdentityFile /home/{{ remote_user }}/.ssh/{{ resource_key_name }}
         marker: "# {mark} ANSIBLE MANAGED BLOCK - resource"
         create: true
 
-    - name: Update /etc/hosts
-      ansible.builtin.lineinfile:
+    - name: Configure host resolution
+      ansible.builtin.blockinfile:
         path: /etc/hosts
-        line: "{{ item }}"
-        state: present
-      loop:
-        - "{{ bastion_elastic_ip }} {{ bastion_private_ip }} terrable.demo.bastion"
-        - "{{ resource_private_ip }} terrable.demo.resource"
+        block: |
+          {{ bastion_elastic_ip }} {{ bastion_private_ip }} {{ bastion_hostname }}
+          {{ resource_private_ip }} {{ resource_hostname }}
+        marker: "# {mark} ANSIBLE MANAGED BLOCK - hosts"
 
-    - name: Set bastion hostname
+    - name: Set system hostname
       ansible.builtin.hostname:
-        name: terrable.demo.bastion
+        name: "{{ bastion_hostname }}"
 
   handlers:
     - name: restart sshd
@@ -101,23 +93,23 @@
   become: true
   vars_files:
     - vars.yml
-
   tasks:
     - name: Create admin user
       ansible.builtin.user:
         name: admin
         password: "{{ 'admin' | password_hash('sha512') }}"
         shell: /bin/bash
+        groups: wheel
+        append: true
 
-    - name: Update /etc/hosts
-      ansible.builtin.lineinfile:
+    - name: Configure host resolution
+      ansible.builtin.blockinfile:
         path: /etc/hosts
-        line: "{{ item }}"
-        state: present
-      loop:
-        - "{{ bastion_elastic_ip }} {{ bastion_private_ip }} terrable.demo.bastion"
-        - "{{ resource_private_ip }} terrable.demo.resource"
+        block: |
+          {{ bastion_elastic_ip }} {{ bastion_private_ip }} {{ bastion_hostname }}
+          {{ resource_private_ip }} {{ resource_hostname }}
+        marker: "# {mark} ANSIBLE MANAGED BLOCK - hosts"
 
-    - name: Set resource hostname
+    - name: Set system hostname
       ansible.builtin.hostname:
-        name: terrable.demo.resource
+        name: "{{ resource_hostname }}"
