@@ -1,5 +1,5 @@
 # terraform-ansible-aws-bastion
-## The "terrable way" to deploy and configure your cloud infra in 5 mins! 
+- The "terrable way" to deploy and configure your cloud infra in 5 mins! 
 
 ![Screenshot 2025-06-23 at 1 14 29 AM](https://github.com/user-attachments/assets/f7e96471-cf76-42b1-97d0-2beffe89a024)
 
