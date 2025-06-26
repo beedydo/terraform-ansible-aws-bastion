@@ -12,9 +12,14 @@ This project automates the deployment of a secure AWS bastion host and resource 
 
 ## Overview
 
-- **Infrastructure as Code:** Terraform provisions AWS resources, while Ansible handles server configuration.
-- **Secure Architecture:** Implements a bastion host in a public subnet and a resource server in a private subnet, with strict network access controls.
-- **SSH Access:** Only allows SSH and ICMP from trusted IPs, with bastion host acting as the sole entry point to the resource server.
+- **Infrastructure as Code:** 
+  - Terraform provisions AWS resources, while
+  - Ansible handles server configuration.
+- **Secure Architecture:** 
+  - Implements a bastion host in a public subnet and a resource server in a private subnet, with strict network access controls.
+- **SSH Access:** 
+  - Only allows SSH and ICMP from trusted IPs, 
+  - with bastion host acting as the ONLY entry point to the resource server.
 
 ---
 
@@ -173,15 +178,18 @@ bastion_public_ip bastion_private_IP terrible.demo.bastion
 resource_private_ip terrible.demo.resource
 ```
 
-## Before running Terriform script:
+## Before running Terraform script:
 
 ```console
 export AWS_ACCESS_KEY_ID="YOUR_ACCESS_KEY"
 export AWS_SECRET_ACCESS_KEY="YOUR_SECRET_KEY"
 export AWS_REGION="ap-southeast-1"
+
+terraform init
+terraform apply
 ```
 
 ## Assumptions:
 
 - key-pairs are managed and stored on AWS
-  - use cloud-init to provide keys managed outside of AWS
+
