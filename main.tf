@@ -12,7 +12,7 @@ locals {
 }
 
 # VPC
-resource "aws_vpc" "terra_ble_vpc" {
+resource "aws_vpc" "terr_ible_vpc" {
   cidr_block           = var.vpc_cidr
   enable_dns_support   = true
   enable_dns_hostnames = true
@@ -22,8 +22,8 @@ resource "aws_vpc" "terra_ble_vpc" {
 }
 
 # Internet Gateway
-resource "aws_internet_gateway" "terrable_demo_igw" {
-  vpc_id = aws_vpc.terra_ble_vpc.id
+resource "aws_internet_gateway" "terrible_demo_igw" {
+  vpc_id = aws_vpc.terr_ible_vpc.id
   tags = {
     Name = var.internet_gateway_name
   }
@@ -31,7 +31,7 @@ resource "aws_internet_gateway" "terrable_demo_igw" {
 
 # Public Subnet
 resource "aws_subnet" "public_subnet" {
-  vpc_id                  = aws_vpc.terra_ble_vpc.id
+  vpc_id                  = aws_vpc.terr_ible_vpc.id
   cidr_block              = var.public_subnet_cidr
   availability_zone       = var.availability_zone
   map_public_ip_on_launch = true
@@ -42,7 +42,7 @@ resource "aws_subnet" "public_subnet" {
 
 # Private Subnet
 resource "aws_subnet" "private_subnet" {
-  vpc_id            = aws_vpc.terra_ble_vpc.id
+  vpc_id            = aws_vpc.terr_ible_vpc.id
   cidr_block        = var.private_subnet_cidr
   availability_zone = var.availability_zone
   tags = {
@@ -52,11 +52,11 @@ resource "aws_subnet" "private_subnet" {
 
 # Public Route Table
 resource "aws_route_table" "public_rt" {
-  vpc_id = aws_vpc.terra_ble_vpc.id
+  vpc_id = aws_vpc.terr_ible_vpc.id
 
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.terrable_demo_igw.id
+    gateway_id = aws_internet_gateway.terrible_demo_igw.id
   }
 
   route {
@@ -77,7 +77,7 @@ resource "aws_route_table_association" "public_rt_assoc" {
 
 # Public NACL
 resource "aws_network_acl" "public_nacl" {
-  vpc_id     = aws_vpc.terra_ble_vpc.id
+  vpc_id     = aws_vpc.terr_ible_vpc.id
   subnet_ids = [aws_subnet.public_subnet.id]
 
   ingress {
@@ -125,7 +125,7 @@ resource "aws_network_acl" "public_nacl" {
 
 # Private NACL
 resource "aws_network_acl" "private_nacl" {
-  vpc_id     = aws_vpc.terra_ble_vpc.id
+  vpc_id     = aws_vpc.terr_ible_vpc.id
   subnet_ids = [aws_subnet.private_subnet.id]
 
   ingress {
@@ -173,7 +173,7 @@ resource "aws_network_acl" "private_nacl" {
 
 # Private Route Table
 resource "aws_route_table" "private_rt" {
-  vpc_id = aws_vpc.terra_ble_vpc.id
+  vpc_id = aws_vpc.terr_ible_vpc.id
 
   route {
     cidr_block = var.vpc_cidr
@@ -194,7 +194,7 @@ resource "aws_route_table_association" "private_rt_assoc" {
 resource "aws_security_group" "bastion_sg" {
   name        = var.bastion_security_group_name
   description = "Security group for bastion host"
-  vpc_id      = aws_vpc.terra_ble_vpc.id
+  vpc_id      = aws_vpc.terr_ible_vpc.id
 
   ingress {
     from_port   = 22
@@ -240,7 +240,7 @@ resource "aws_security_group" "bastion_sg" {
 resource "aws_security_group" "resource_sg" {
   name        = var.resource_security_group_name
   description = "Security group for resource server"
-  vpc_id      = aws_vpc.terra_ble_vpc.id
+  vpc_id      = aws_vpc.terr_ible_vpc.id
 
   ingress {
     from_port       = 22

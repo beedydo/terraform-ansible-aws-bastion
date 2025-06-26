@@ -1,11 +1,11 @@
 # Terraform-generated IPs
 bastion_elastic_ip: 18.142.141.30
-bastion_private_ip: 10.0.0.12
-resource_private_ip: 10.0.0.23
+bastion_private_ip: 10.0.0.5
+resource_private_ip: 10.0.0.25
     
 # Hostname Configuration
-bastion_hostname: terrable.demo.bastion
-resource_hostname: terrable.demo.resource
+bastion_hostname: terrible.demo.bastion
+resource_hostname: terrible.demo.resource
     
 # User Configuration
 remote_user: ec2-user

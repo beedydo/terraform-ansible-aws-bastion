@@ -21,7 +21,7 @@ variable "vpc_cidr" {
 variable "vpc_name" {
   description = "VPC name tag"
   type        = string
-  default     = "terra-ble-vpc"
+  default     = "terr-ible-vpc"
 }
 
 # Subnet Configuration
@@ -47,7 +47,7 @@ variable "availability_zone" {
 variable "internet_gateway_name" {
   description = "Internet Gateway name tag"
   type        = string
-  default     = "terrable-demo-igw"
+  default     = "terrible-demo-igw"
 }
 
 variable "public_subnet_name" {
@@ -121,7 +121,7 @@ variable "bastion_key_name" {
 variable "bastion_instance_name" {
   description = "Bastion instance name tag"
   type        = string
-  default     = "terrable-bastion"
+  default     = "terrible-bastion"
 }
 
 variable "bastion_eip_allocation_id" {
@@ -152,19 +152,19 @@ variable "resource_key_name" {
 variable "resource_instance_name" {
   description = "Resource server instance name tag"
   type        = string
-  default     = "terrable-resource"
+  default     = "terrible-resource"
 }
 
 variable "bastion_hostname" {
   description = "Hostname for the bastion host"
   type        = string
-  default     = "terrable.demo.bastion"
+  default     = "terrible.demo.bastion"
 }
 
 variable "resource_hostname" {
   description = "Hostname for the resource server"
   type        = string
-  default     = "terrable.demo.resource"
+  default     = "terrible.demo.resource"
 }
 
 variable "remote_user" {

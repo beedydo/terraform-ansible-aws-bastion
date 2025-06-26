@@ -68,8 +68,8 @@ This project automates the deployment of a secure AWS bastion host and resource 
 **Bastion Host:**
 
 - **Deployed in the public subnet**
-- **Public IP:** "{{ elastic_ip_address }}"
-- **Key pair:** "{{ your_key_pair }}"
+  - **Public IP:** "{{ elastic_ip_address }}"
+  - **Key pair:** "{{ your_key_pair }}"
 - **Security Group:**
   - **Inbound:**
     - SSH from trusted IP: "{{ MyIP }}"/32
