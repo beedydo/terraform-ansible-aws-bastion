@@ -33,10 +33,10 @@
 **Bastion Host:**
 
 - **Deployed in the public subnet**
-- **Public IP:** 18.142.141.30 (Elastic IP)
-- **Key pair:** interview-demo-key
-- **Public IP:** "{{ elastic_ip_address }}"
-- **Key pair:** "{{ your_key_pair }}"
+  - **Public IP:** 18.142.141.30 (Elastic IP)
+  - **Key pair:** interview-demo-key
+  - **Public IP:** "{{ elastic_ip_address }}"
+  - **Key pair:** "{{ your_key_pair }}"
 - **Security Group:**
   - **Inbound:**
     - SSH from trusted IP: 220.255.73.250/32
